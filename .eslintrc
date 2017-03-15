@@ -1,0 +1,64 @@
+{
+    "parser": "babel-eslint",
+    "extends": "airbnb",
+    "env": {
+        "browser": true,
+        "node": true
+    },
+    "globals": {
+        "__TESTING__": true
+    },
+    "rules": {
+        "max-len": 0,
+        "indent": [
+            2,
+            4,
+            {
+                "SwitchCase": 1
+            }
+        ],
+        "spaced-comment": 0,
+        "no-else-return": 0,
+        "quote-props": [
+            0,
+            "consistent-as-needed"
+        ],
+        "global-require": 0,
+        "arrow-body-style": 0,
+        "no-unused-expressions": 0,
+        "no-nested-ternary": 0,
+        "comma-dangle": 0,
+        "no-console": 0,
+        "react/forbid-prop-types": 0,
+        "valid-jsdoc": [
+            1,
+            {
+                "requireParamDescription": true,
+                "requireReturnDescription": true,
+                "requireReturn": false,
+                "prefer": {
+                    "return": "return"
+                },
+                "preferType": {
+                    "String": "string",
+                    "Number": "number",
+                    "Boolean": "boolean",
+                    "Bool": "boolean",
+                    "array": "Array",
+                    "object": "Object",
+                    "function": "Function"
+                }
+            }
+        ],
+        "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+        "react/prefer-stateless-function": 0,
+        "react/jsx-indent-props": [
+            2,
+            4
+        ],
+        "react/jsx-indent": [
+            2,
+            4
+        ]
+    }
+}
