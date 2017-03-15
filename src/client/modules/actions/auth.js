@@ -1,14 +1,6 @@
 import appConfig from '../../config/appConfig';
 
 
-export const CHECK_FIREBASE_AUTH = 'CHECK_FIREBASE_AUTH';
-
-export function checkFirebaseAuth() {
-    return {
-        type: CHECK_FIREBASE_AUTH,
-    };
-}
-
 export const AUTH_FAILED = 'AUTH_FAILED';
 export function authFailed() {
     return {
