@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var fs = require('fs');
 var path = require('path');
 var webpack = require('webpack');
 var config = require('./webpack.config');
@@ -36,6 +37,11 @@ module.exports = _.merge({}, config, {
         hot: true,
         outputPath: path.join(__dirname, '../dist/static'),
         contentBase: path.resolve(__dirname, '../src/client/assets/html/'),
+        https: {
+            key: fs.readFileSync(path.join(__dirname, '../ssl/server.key')),
+            cert: fs.readFileSync(path.join(__dirname, '../ssl/server.crt')),
+            ca: fs.readFileSync(path.join(__dirname, '../ssl/server.csr')),
+        }
         // proxy: {
         //     '/api/*': {
         //         target: 'http://reachlive.redirectme.net:10010',

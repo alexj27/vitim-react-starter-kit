@@ -1,15 +1,77 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-        <title>Roche Web</title>
-        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
-        <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">-->
-        <link rel="stylesheet" href="/static/css/main.css">
-    </head>
-    <body>
-        <div id="root"></div>
-        <script src="/static/js/main.js"></script>
-    </body>
-</html>
+<html >
+<head >
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" >
+    <title >Roche Web</title >
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" >
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">-->
+    <link rel="stylesheet" href="/static/css/main.css" >
+    <script >
+        window.id = `${Math.round(100 * Math.random())}`;
+        document.title = `Title #${window.id }`;
+    </script >
+    <script src="/canvasjs.min.js" ></script >
+    <script type="text/javascript" >
+
+        window.onload = function () {
+            window.chart1 = new CanvasJS.Chart("chartContainer", {
+                theme: "theme2",//theme1
+                title: {
+                    text: "Basic Column Chart - CanvasJS"
+                },
+                animationEnabled: false,   // change to true
+                data: [
+                    {
+                        // Change type to "bar", "area", "spline", "pie",etc.
+                        type: "column",
+                        dataPoints: [
+                            { label: "apple", y: 10 },
+                            { label: "orange", y: 15 },
+                            { label: "banana", y: 25 },
+                            { label: "mango", y: 30 },
+                            { label: "grape", y: 28 }
+                        ]
+                    }
+                ]
+            });
+            window.chart1.render();
+
+            window.chart2 = new CanvasJS.Chart("chartContainer1", {
+                theme: "theme2",//theme1
+                title: {
+                    text: "Basic Column Chart - CanvasJS"
+                },
+                animationEnabled: false,   // change to true
+                data: [
+                    {
+                        // Change type to "bar", "area", "spline", "pie",etc.
+                        type: "column",
+                        dataPoints: [
+                            { label: "apple", y: 4 },
+                            { label: "orange", y: 5 },
+                            { label: "banana", y: 6 },
+                            { label: "mango", y: 30 },
+                            { label: "grape", y: 4 }
+                        ]
+                    }
+                ]
+            });
+            window.chart2.render();
+
+            const script = document.createElement('script');
+            script.src = '/static/js/main.js';
+            document.head.appendChild(script);
+        }
+    </script >
+</head >
+<body >
+<div id="root" ></div >
+
+<div class="container" style="display: flex; flex-direction: row" >
+    <div id="chartContainer" style="height: 200px; width: 300px; margin: 10px;" ></div >
+    <div id="chartContainer1" style="height: 200px; width: 300px; margin: 10px;" ></div >
+</div >
+
+</body >
+</html >

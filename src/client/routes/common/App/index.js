@@ -17,15 +17,13 @@ class App extends Component {
 
     render() {
         return (
-            <Scrollbars
+            <div
                 className="App"
-                autoHeight
-                autoHeightMin={this.props.viewport.height}
             >
                 <div className="App-content">
                     {this.props.children}
                 </div>
-            </Scrollbars>
+            </div>
         );
     }
 }

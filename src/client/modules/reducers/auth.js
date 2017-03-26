@@ -5,11 +5,12 @@ import { toCamelCaseObject } from '../../helpers/utils';
 
 const initialState = {
     user: {
+        userId: window.id,
         theme: {
             headerBackground: 'http://lorempixel.com/1600/200/',
         }
     },
-    logged: false,
+    isLogged: true,
     requestId: null,
 };
 

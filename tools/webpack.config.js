@@ -64,6 +64,10 @@ var config = {
                 loader: 'file-loader?&name=fonts/[hash].[ext]'
             },
             {
+                test: /\.svg$/,
+                loader: 'svg-loader'
+            },
+            {
                 test: /\.json$/,
                 loader: 'json-loader',
                 exclude: /(node_modules|bower_components)/,
