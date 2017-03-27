@@ -8,7 +8,7 @@ function WebSocketClient() {
 }
 
 
-WebSocketClient.prototype.open = (url) => {
+WebSocketClient.prototype.open = function (url) {
     this.url = url;
     this.instance = new WebSocket(this.url);
     this.instance.onopen = (e) => {
@@ -41,7 +41,7 @@ WebSocketClient.prototype.open = (url) => {
     };
 };
 
-WebSocketClient.prototype.send = (data, option) => {
+WebSocketClient.prototype.send = function(data, option) {
     try {
         this.instance.send(data, option);
     } catch (e) {
@@ -49,7 +49,7 @@ WebSocketClient.prototype.send = (data, option) => {
     }
 };
 
-WebSocketClient.prototype.reconnect = (e) => {
+WebSocketClient.prototype.reconnect = function(e){
     console.log(`WebSocketClient: retry in ${this.autoReconnectInterval}ms`, e);
     const that = this;
     setTimeout(() => {
@@ -70,11 +70,13 @@ export default function signalsMiddleware({ dispatch, getState }) {
 
     webSocket.onopen = () => {
         //user registration
-        const { auth: { user: { userId: selfId } } } = getState();
-        webSocket.send(JSON.stringify({
-            type: actionTypes.SIG_REGISTRATION,
-            selfId,
-        }));
+        const { auth: { user } } = getState();
+        if (user) {
+            webSocket.send(JSON.stringify({
+                type: actionTypes.SIG_REGISTRATION,
+                selfId: user.userId,
+            }));
+        }
         dispatch(actionTypes.sigConnected());
     };
 
@@ -91,14 +93,14 @@ export default function signalsMiddleware({ dispatch, getState }) {
         dispatch({ ...JSON.parse(response.data), fromServer: true });
     };
 
-    return next => async(action) => {
+    return next => async (action) => {
         if (action.type.indexOf('SIG') === -1 || action.fromServer || action.type.indexOf('TRIGGERED') > -1) {
             return next(action);
         }
 
         dispatch({ ...action, type: actionTypes.triggered(action.type) });
 
-        return new Promise(async(resolve) => {
+        return new Promise(async (resolve) => {
             const { signals: { connected } } = getState();
             while (!connected) {
                 await sleep(3000);
