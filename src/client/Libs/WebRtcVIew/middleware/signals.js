@@ -8,20 +8,20 @@ function WebSocketClient() {
 }
 
 
-WebSocketClient.prototype.open = function (url) {
+WebSocketClient.prototype.open = (url) => {
     this.url = url;
     this.instance = new WebSocket(this.url);
     this.instance.onopen = (e) => {
         this.onopen(e);
     };
-    this.instance.onmessage = (data, flags)=> {
+    this.instance.onmessage = (data, flags) => {
         this.number++;
         this.onmessage(data, flags, this.number);
     };
-    this.instance.onclose = (e)=> {
+    this.instance.onclose = (e) => {
         switch (e) {
             case 1000:  // CLOSE_NORMAL
-                console.log("WebSocket: closed");
+                console.log('WebSocket: closed');
                 break;
             default:    // Abnormal closure
                 this.reconnect(e);
@@ -29,7 +29,7 @@ WebSocketClient.prototype.open = function (url) {
         }
         this.onclose(e);
     };
-    this.instance.onerror = (e)=> {
+    this.instance.onerror = (e) => {
         switch (e.code) {
             case 'ECONNREFUSED':
                 this.reconnect(e);
@@ -53,7 +53,7 @@ WebSocketClient.prototype.reconnect = function (e) {
     console.log(`WebSocketClient: retry in ${this.autoReconnectInterval}ms`, e);
     var that = this;
     setTimeout(function () {
-        console.log("WebSocketClient: reconnecting...");
+        console.log('WebSocketClient: reconnecting...');
         that.open(that.url);
     }, this.autoReconnectInterval);
 };
