@@ -15,7 +15,7 @@ WebSocketClient.prototype.open = (url) => {
         this.onopen(e);
     };
     this.instance.onmessage = (data, flags) => {
-        this.number++;
+        this.number += 1;
         this.onmessage(data, flags, this.number);
     };
     this.instance.onclose = (e) => {
@@ -41,7 +41,7 @@ WebSocketClient.prototype.open = (url) => {
     };
 };
 
-WebSocketClient.prototype.send = function (data, option) {
+WebSocketClient.prototype.send = (data, option) => {
     try {
         this.instance.send(data, option);
     } catch (e) {
@@ -49,10 +49,10 @@ WebSocketClient.prototype.send = function (data, option) {
     }
 };
 
-WebSocketClient.prototype.reconnect = function (e) {
+WebSocketClient.prototype.reconnect = (e) => {
     console.log(`WebSocketClient: retry in ${this.autoReconnectInterval}ms`, e);
-    var that = this;
-    setTimeout(function () {
+    const that = this;
+    setTimeout(() => {
         console.log('WebSocketClient: reconnecting...');
         that.open(that.url);
     }, this.autoReconnectInterval);
