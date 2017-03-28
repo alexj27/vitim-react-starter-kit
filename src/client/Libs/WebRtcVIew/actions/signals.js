@@ -1,11 +1,8 @@
 export const SIG_REGISTRATION = 'SIG_REGISTRATION';
-export function sigRegistration() {
-    return function (dispatch, getState) {
-        const { auth: { user: { userId: selfId } } } = getState();
-        return dispatch({
-            type: SIG_REGISTRATION,
-            selfId,
-        });
+export function sigRegistration(selfId) {
+    return {
+        type: SIG_REGISTRATION,
+        selfId,
     };
 }
 
@@ -52,7 +49,7 @@ export function sigNoConnection() {
     };
 }
 
-export const WS_ERROR= 'WS_ERROR';
+export const WS_ERROR = 'WS_ERROR';
 export function wsError(error) {
     return {
         type: WS_ERROR,

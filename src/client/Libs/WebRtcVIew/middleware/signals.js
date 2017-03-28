@@ -14,14 +14,14 @@ WebSocketClient.prototype.open = function (url) {
     this.instance.onopen = (e) => {
         this.onopen(e);
     };
-    this.instance.onmessage = (data, flags)=> {
-        this.number++;
+    this.instance.onmessage = (data, flags) => {
+        this.number += 1;
         this.onmessage(data, flags, this.number);
     };
-    this.instance.onclose = (e)=> {
+    this.instance.onclose = (e) => {
         switch (e) {
             case 1000:  // CLOSE_NORMAL
-                console.log("WebSocket: closed");
+                console.log('WebSocket: closed');
                 break;
             default:    // Abnormal closure
                 this.reconnect(e);
@@ -29,7 +29,7 @@ WebSocketClient.prototype.open = function (url) {
         }
         this.onclose(e);
     };
-    this.instance.onerror = (e)=> {
+    this.instance.onerror = (e) => {
         switch (e.code) {
             case 'ECONNREFUSED':
                 this.reconnect(e);
@@ -41,7 +41,7 @@ WebSocketClient.prototype.open = function (url) {
     };
 };
 
-WebSocketClient.prototype.send = function (data, option) {
+WebSocketClient.prototype.send = function(data, option) {
     try {
         this.instance.send(data, option);
     } catch (e) {
@@ -49,11 +49,11 @@ WebSocketClient.prototype.send = function (data, option) {
     }
 };
 
-WebSocketClient.prototype.reconnect = function (e) {
+WebSocketClient.prototype.reconnect = function(e){
     console.log(`WebSocketClient: retry in ${this.autoReconnectInterval}ms`, e);
-    var that = this;
-    setTimeout(function () {
-        console.log("WebSocketClient: reconnecting...");
+    const that = this;
+    setTimeout(() => {
+        console.log('WebSocketClient: reconnecting...');
         that.open(that.url);
     }, this.autoReconnectInterval);
 };
@@ -70,11 +70,13 @@ export default function signalsMiddleware({ dispatch, getState }) {
 
     webSocket.onopen = () => {
         //user registration
-        const { auth: { user: { userId: selfId } } } = getState();
-        webSocket.send(JSON.stringify({
-            type: actionTypes.SIG_REGISTRATION,
-            selfId,
-        }));
+        const { auth: { user } } = getState();
+        if (user) {
+            webSocket.send(JSON.stringify({
+                type: actionTypes.SIG_REGISTRATION,
+                selfId: user.userId,
+            }));
+        }
         dispatch(actionTypes.sigConnected());
     };
 
@@ -91,14 +93,14 @@ export default function signalsMiddleware({ dispatch, getState }) {
         dispatch({ ...JSON.parse(response.data), fromServer: true });
     };
 
-    return next => async(action) => {
+    return next => async (action) => {
         if (action.type.indexOf('SIG') === -1 || action.fromServer || action.type.indexOf('TRIGGERED') > -1) {
             return next(action);
         }
 
         dispatch({ ...action, type: actionTypes.triggered(action.type) });
 
-        return new Promise(async(resolve) => {
+        return new Promise(async (resolve) => {
             const { signals: { connected } } = getState();
             while (!connected) {
                 await sleep(3000);

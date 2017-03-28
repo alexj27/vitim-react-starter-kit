@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
-import WebRtc from '../components/WebRtc';
 import { connect } from 'react-redux';
+import WebRtc from '../components/WebRtc';
 import * as actions from '../actions';
 
 
