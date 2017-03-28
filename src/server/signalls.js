@@ -1,4 +1,4 @@
-var ws = require("nodejs-websocket");
+const WebSocket = require('ws');
 var _ = require("lodash");
 
 /**
@@ -68,35 +68,35 @@ function initConnection(conn) {
     console.log("New connection");
     var userId;
 
-    conn.on("text", function (json) {
+    conn.on("message", function (json) {
         console.log("Received ", json);
         const request = p(json);
 
         switch (request.type) {
             case SIG_REGISTRATION: {
                 userId = request.selfId.toString();
-                conn.sendText(s({ type: succeeded(SIG_REGISTRATION) }));
-                conn.sendText(s({ type: SIG_SET_REGISTERED_USERS, users: Object.keys(connections).filter(function(id){ return (id.toString() !== userId.toString()) }) }));
+                conn.send(s({ type: succeeded(SIG_REGISTRATION) }));
+                conn.send(s({ type: SIG_SET_REGISTERED_USERS, users: Object.keys(connections).filter(function(id){ return (id.toString() !== userId.toString()) }) }));
 
                 connections[request.selfId] = conn;
                 registrationsNotify(request.selfId);
                 break;
             }
             case SIG_SET_REGISTERED_USERS: {
-                conn.sendText(s({ type: SIG_SET_REGISTERED_USERS, users: Object.keys(connections).filter(function(id){ return (id.toString() !== userId.toString()) }) }));
+                conn.send(s({ type: SIG_SET_REGISTERED_USERS, users: Object.keys(connections).filter(function(id){ return (id.toString() !== userId.toString()) }) }));
                 console.log(s({ type: SIG_SET_REGISTERED_USERS, users: Object.keys(connections).filter(function(id){ return (id.toString() !== userId.toString()) }) }));
                 break;
             }
             case SIG_CALL: {
                 if (connections[request.userId]) {
-                    connections[request.userId].sendText(s({ type: SIG_CALL_OFFER, userId: userId }));
+                    connections[request.userId].send(s({ type: SIG_CALL_OFFER, userId: userId }));
                 } else {
-                    conn.sendText(s({ type: failed(SIG_CALL), userId: request.userId, reason: 'not_registered' }));
+                    conn.send(s({ type: failed(SIG_CALL), userId: request.userId, reason: 'not_registered' }));
                 }
                 break;
             }
             case SIG_CALL_ACCEPTED: {
-                connections[request.userId].sendText(s({
+                connections[request.userId].send(s({
                     type: succeeded(SIG_CALL),
                     to: request.userId,
                     from: userId
@@ -105,13 +105,13 @@ function initConnection(conn) {
             }
             case SIG_CALL_REJECTED: {
                 if (request.userId && connections[request.userId]) {
-                    connections[request.userId].sendText(s({
+                    connections[request.userId].send(s({
                         type: failed(SIG_CALL),
                         reason: 'rejected',
                         from: userId
                     }));
                 } else {
-                    conn.sendText(s({
+                    conn.send(s({
                         type: failed(SIG_CALL_REJECTED),
                         reason: 'user_unavailable'
                     }));
@@ -120,9 +120,9 @@ function initConnection(conn) {
             }
             case SIG_HUNG_UP: {
                 if (request.to && connections[request.to]) {
-                    connections[request.to].sendText(s(request));
+                    connections[request.to].send(s(request));
                 } else {
-                    conn.sendText(s({
+                    conn.send(s({
                         type: failed(SIG_HUNG_UP),
                         reason: 'user_unavailable'
                     }));
@@ -133,9 +133,9 @@ function initConnection(conn) {
                 if (request.to && connections[request.to]) {
                     console.log('Exchange', request);
                     request.from = userId;
-                    connections[request.to].sendText(s(request));
+                    connections[request.to].send(s(request));
                 } else {
-                    conn.sendText(s({
+                    conn.send(s({
                         type: failed(SIG_EXCHANGE),
                         userId: request.userId,
                         reason: 'user_unavailable'
@@ -158,5 +158,10 @@ function initConnection(conn) {
     });
 }
 
+const wss = new WebSocket.Server({
+  perMessageDeflate: true,
+  port: 8001
+});
 
-ws.createServer(initConnection).listen(8001);
+
+wss.on('connection', initConnection);
