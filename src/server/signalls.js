@@ -1,3 +1,4 @@
+/* eslint-disable */
 const fs = require('fs');
 const https = require('https');
 const http = require('http');
@@ -32,6 +33,8 @@ const SIG_SET_REGISTERED_USERS = 'SIG_SET_REGISTERED_USERS';
 const SIG_CALL_ACCEPTED = 'SIG_CALL_ACCEPTED';
 const SIG_CALL_REJECTED = 'SIG_CALL_REJECTED';
 const SIG_HUNG_UP = 'SIG_HUNG_UP';
+const SIG_USERS_BUSY = 'SIG_USERS_BUSY';
+const SIG_USERS_FREE = 'SIG_USERS_FREE';
 
 
 function s(obj) {
@@ -43,12 +46,15 @@ function p(json) {
 }
 
 const connections = {};
+const activeCalls = {};
+const patients = {};
+const doctors = {};
 
 
 function disconnectUser(userId) {
     const user = connections[userId];
     if (!user) {
-        return null;
+        return;
     }
     delete connections[userId];
 
@@ -60,19 +66,46 @@ function disconnectUser(userId) {
 
 function registrationsNotify(userId) {
     _.forEach(connections, function (connection, id) {
-        console.log('Notify user', id);
         if (id !== userId) {
             connection.send(s({ type: SIG_USER_REGISTERED, userId: userId }));
         }
-    })
+    });
 }
+
+
+function setActiveCall(from, to) {
+    activeCalls[from] = true;
+    activeCalls[to] = true;
+
+    _.forEach(connections, function (connection, id) {
+        if (id !== from) {
+            connection.send(s({ type: SIG_USERS_BUSY, users: [from, to].filter(id => id) }));
+        }
+    });
+}
+
+function removeActiveCall(from, to) {
+    activeCalls[from] = false;
+    activeCalls[to] = false;
+
+    _.forEach(connections, function (connection, id) {
+        if (id !== from) {
+            connection.send(s({ type: SIG_USERS_FREE, users: [from, to].filter(id => id) }));
+        }
+    });
+}
+
+function isActiveCall(from, to) {
+    return activeCalls[from] || activeCalls[to];
+}
+
 
 function initConnection(conn) {
     console.log('New connection');
     var userId;
 
     conn.on('message', function (json) {
-        console.log('Received ', json);
+        //console.log('Received ', json);
         const request = p(json);
 
         switch (request.type) {
@@ -89,21 +122,11 @@ function initConnection(conn) {
                 registrationsNotify(request.selfId);
                 break;
             }
-            case SIG_SET_REGISTERED_USERS: {
-                conn.send(s({
-                    type: SIG_SET_REGISTERED_USERS, users: Object.keys(connections).filter(function (id) {
-                        return (id.toString() !== userId.toString())
-                    })
-                }));
-                console.log(s({
-                    type: SIG_SET_REGISTERED_USERS, users: Object.keys(connections).filter(function (id) {
-                        return (id.toString() !== userId.toString())
-                    })
-                }));
-                break;
-            }
             case SIG_CALL: {
-                if (connections[request.userId]) {
+                if (isActiveCall(userId, request.userId)) {
+                    conn.send(s({ type: failed(SIG_CALL), userId: request.userId, reason: 'busy' }));
+                } else if (connections[request.userId]) {
+                    setActiveCall(userId, request.userId);
                     connections[request.userId].send(s({ type: SIG_CALL_OFFER, userId: userId }));
                 } else {
                     conn.send(s({ type: failed(SIG_CALL), userId: request.userId, reason: 'not_registered' }));
@@ -119,6 +142,8 @@ function initConnection(conn) {
                 break;
             }
             case SIG_CALL_REJECTED: {
+                removeActiveCall(userId, request.userId);
+
                 if (request.userId && connections[request.userId]) {
                     connections[request.userId].send(s({
                         type: failed(SIG_CALL),
@@ -134,6 +159,8 @@ function initConnection(conn) {
                 break;
             }
             case SIG_HUNG_UP: {
+                removeActiveCall(userId, request.to);
+
                 if (request.to && connections[request.to]) {
                     connections[request.to].send(s(request));
                 } else {
@@ -192,12 +219,12 @@ const app = https.createServer({
     key: fs.readFileSync(cfg.ssl_key),
     cert: fs.readFileSync(cfg.ssl_cert)
 
-}, processRequest).listen(cfg.port, "0.0.0.0", function (){
+}, processRequest).listen(cfg.port, "0.0.0.0", function () {
     console.log('Server secure is up');
 });
 
 
-const appHttp = http.createServer(processRequest).listen(8002, "0.0.0.0", function (){
+const appHttp = http.createServer(processRequest).listen(8002, "0.0.0.0", function () {
     console.log('Server local is up');
 });
 
