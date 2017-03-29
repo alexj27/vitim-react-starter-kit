@@ -1,5 +1,6 @@
 const fs = require('fs');
 const https = require('https');
+const http = require('http');
 const WebSocket = require('ws');
 const _ = require('lodash');
 
@@ -191,12 +192,19 @@ const app = https.createServer({
     key: fs.readFileSync(cfg.ssl_key),
     cert: fs.readFileSync(cfg.ssl_cert)
 
-}, processRequest).listen(cfg.port, function (){
-    console.log('Server is up');
+}, processRequest).listen(cfg.port, "0.0.0.0", function (){
+    console.log('Server secure is up');
+});
+
+
+const appHttp = http.createServer(processRequest).listen(8002, "0.0.0.0", function (){
+    console.log('Server local is up');
 });
 
 
 const wss = new WebSocket.Server({ server: app });
+const wssLocal = new WebSocket.Server({ server: appHttp });
 
 
 wss.on('connection', initConnection);
+wssLocal.on('connection', initConnection);

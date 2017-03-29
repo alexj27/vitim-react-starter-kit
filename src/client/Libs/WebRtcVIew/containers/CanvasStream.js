@@ -58,7 +58,7 @@ class CanvasStreamContainer extends Component {
     };
 
     getStream = () => {
-        return this.share.captureStream();
+        return this.share.captureStream(25);
     };
 
     captureCanvasInterval = (srcCtx) => {

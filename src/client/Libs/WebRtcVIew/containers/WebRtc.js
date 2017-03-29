@@ -43,7 +43,7 @@ class WebRtcContainer extends Component {
         selfViewSrc: null,
         status: null,
         remoteViewSrc: null,
-        info: '',
+        offerSent: false,
         ready: false,
         remoteList: {},
         pc: null,
@@ -120,6 +120,8 @@ class WebRtcContainer extends Component {
     };
 
     createPC = (fromId, isOffer) => {
+        let isOfferContext = isOffer;
+
         const { dispatch } = this.props;
         const pc = new RTCPeerConnection(configuration);
         this.state.pc = pc;
@@ -133,7 +135,8 @@ class WebRtcContainer extends Component {
 
         pc.onnegotiationneeded = () => {
             console.log('onnegotiationneeded');
-            if (isOffer) {
+            if (isOfferContext) {
+                isOfferContext = false;
                 this.createOffer(fromId);
             }
         };
