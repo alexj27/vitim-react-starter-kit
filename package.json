@@ -5,7 +5,7 @@
   "description": "Roche Web",
   "scripts": {
     "client:dev": "webpack-dev-server --config tools/webpack.config.dev.js --port 8001 --host 0.0.0.0 --inline --history-api-fallback",
-    "client:dev:server": "NODE_ENV=staging webpack-dev-server --config tools/webpack.config.dev.js --port 8443 --host 0.0.0.0 --inline --history-api-fallback",
+    "client:dev:server": "NODE_ENV=staging webpack-dev-server --config tools/webpack.config.dev.js --port 8001 --host 0.0.0.0 --inline --history-api-fallback",
     "server:run": "nodemon dist/server/server.js --watch dist",
     "server:prepare": "webpack --watch --colors --progress --config tools/webpack.config.server.js",
     "server:dev": "npm-run-all --parallel server:prepare server:run",
