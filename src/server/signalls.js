@@ -1,8 +1,10 @@
+const fs = require('fs');
+const https = require('https');
 const WebSocket = require('ws');
-var _ = require("lodash");
+const _ = require('lodash');
 
 /**
- * Action "succeeded" type creator
+ * Action 'succeeded' type creator
  * @param  {string} type - action type
  * @return {string} new action type
  */
@@ -11,7 +13,7 @@ function succeeded(type) {
 }
 
 /**
- * Action "failed" type creator
+ * Action 'failed' type creator
  * @param  {string} type - action type
  * @return {string} new action type
  */
@@ -51,13 +53,13 @@ function disconnectUser(userId) {
 
     _.forEach(connections, function (connection) {
         connection.send(s({ type: SIG_USER_DISCONNECTED, userId: userId }));
-    })
+    });
 }
 
 
 function registrationsNotify(userId) {
     _.forEach(connections, function (connection, id) {
-        console.log("Notify user", id);
+        console.log('Notify user', id);
         if (id !== userId) {
             connection.send(s({ type: SIG_USER_REGISTERED, userId: userId }));
         }
@@ -65,26 +67,38 @@ function registrationsNotify(userId) {
 }
 
 function initConnection(conn) {
-    console.log("New connection");
+    console.log('New connection');
     var userId;
 
-    conn.on("message", function (json) {
-        console.log("Received ", json);
+    conn.on('message', function (json) {
+        console.log('Received ', json);
         const request = p(json);
 
         switch (request.type) {
             case SIG_REGISTRATION: {
                 userId = request.selfId.toString();
                 conn.send(s({ type: succeeded(SIG_REGISTRATION) }));
-                conn.send(s({ type: SIG_SET_REGISTERED_USERS, users: Object.keys(connections).filter(function(id){ return (id.toString() !== userId.toString()) }) }));
+                conn.send(s({
+                    type: SIG_SET_REGISTERED_USERS, users: Object.keys(connections).filter(function (id) {
+                        return (id.toString() !== userId.toString())
+                    })
+                }));
 
                 connections[request.selfId] = conn;
                 registrationsNotify(request.selfId);
                 break;
             }
             case SIG_SET_REGISTERED_USERS: {
-                conn.send(s({ type: SIG_SET_REGISTERED_USERS, users: Object.keys(connections).filter(function(id){ return (id.toString() !== userId.toString()) }) }));
-                console.log(s({ type: SIG_SET_REGISTERED_USERS, users: Object.keys(connections).filter(function(id){ return (id.toString() !== userId.toString()) }) }));
+                conn.send(s({
+                    type: SIG_SET_REGISTERED_USERS, users: Object.keys(connections).filter(function (id) {
+                        return (id.toString() !== userId.toString())
+                    })
+                }));
+                console.log(s({
+                    type: SIG_SET_REGISTERED_USERS, users: Object.keys(connections).filter(function (id) {
+                        return (id.toString() !== userId.toString())
+                    })
+                }));
                 break;
             }
             case SIG_CALL: {
@@ -147,21 +161,42 @@ function initConnection(conn) {
         }
     });
 
-    conn.on("error", function (errObj) {
+    conn.on('error', function (errObj) {
         console.log('Error', errObj);
         disconnectUser(userId);
     });
 
-    conn.on("close", function (code, reason) {
+    conn.on('close', function (code, reason) {
         const user = disconnectUser(userId);
-        console.log("Connection closed", userId, code, reason, user && user.userId);
+        console.log('Connection closed', userId, code, reason, user && user.userId);
     });
 }
 
-const wss = new WebSocket.Server({
-  perMessageDeflate: true,
-  port: 8001
+
+const processRequest = function (req, res) {
+    res.writeHead(200);
+    res.end('All glory to WebSockets!\n');
+};
+
+
+const cfg = {
+    ssl: true,
+    port: 8443,
+    ssl_key: '/etc/nginx/ssl/vit.im.key',
+    ssl_cert: '/etc/nginx/ssl/vit.im.crt',
+};
+
+
+const app = https.createServer({
+    key: fs.readFileSync(cfg.ssl_key),
+    cert: fs.readFileSync(cfg.ssl_cert)
+
+}, processRequest).listen(cfg.port, function (){
+    console.log('Server is up');
 });
+
+
+const wss = new WebSocket.Server({ server: app });
 
 
 wss.on('connection', initConnection);

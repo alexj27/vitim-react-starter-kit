@@ -38,9 +38,8 @@ module.exports = _.merge({}, config, {
         outputPath: path.join(__dirname, '../dist/static'),
         contentBase: path.resolve(__dirname, '../src/client/assets/html/'),
         https: {
-            key: fs.readFileSync(path.join(__dirname, '../ssl/server.key')),
-            cert: fs.readFileSync(path.join(__dirname, '../ssl/server.crt')),
-            ca: fs.readFileSync(path.join(__dirname, '../ssl/server.csr')),
+            key: fs.readFileSync('/etc/nginx/ssl/vit.im.key', 'utf8'),
+            cert: fs.readFileSync('/etc/nginx/ssl/vit.im.crt', 'utf8'),
         }
         // proxy: {
         //     '/api/*': {

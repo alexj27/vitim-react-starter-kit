@@ -1,4 +1,4 @@
 export default {
     BASE_URL: '',
-    WS_SERVER: 'ws://localhost:8001/'
+    WS_SERVER: 'wss://localhost:8443/'
 };
