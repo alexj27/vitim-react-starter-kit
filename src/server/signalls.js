@@ -113,7 +113,7 @@ function initConnection(conn) {
             case SIG_REGISTRATION: {
                 userId = request.selfId;
                 if (connections[userId]) {
-                    conn.send(s({ type: failed(SIG_REGISTRATION), reason: 'already registered' }));
+                    conn.send(s({ type: failed(SIG_REGISTRATION), reason: 'Another user use this account' }));
                     break;
                 }
 
