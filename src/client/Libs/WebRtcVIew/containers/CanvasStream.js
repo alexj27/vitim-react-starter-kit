@@ -15,43 +15,73 @@ function getMousePos(canvas, evt) {
 class CanvasStreamContainer extends Component {
 
     static propTypes = {
-        capturedContext: PropTypes.object,
+        drawable: PropTypes.bool,
+        chart: PropTypes.object,
     };
 
     static defaultProps = {
-        capturedContext: null,
+        drawable: false,
+        chart: null,
     };
 
     state = {
         mouseEvt: null,
+        canDraw: false
     };
 
     componentWillMount() {
         document.addEventListener('mousemove', this.onMouseMove, false);
+        document.addEventListener('mousedown', this.onMouseDown, false);
+        document.addEventListener('mouseup', this.onMouseUp, false);
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.share && this.props.capturedContext && nextProps.capturedContext !== this.props.capturedContext) {
+        if (this.share && this.props.chart && nextProps.chart !== this.props.chart) {
             typeof this.interval !== 'undefined' && clearInterval(this.interval);
 
-            this.captureCanvasInterval(this.props.capturedContext).then((interval) => {
+            this.captureCanvasInterval(this.props.chart.ctx).then((interval) => {
                 this.interval = interval;
             });
+        }
+
+        if (this.props.chart && nextProps.drawable !== this.props.drawable) {
+            this.props.chart.options.zoomEnabled = this.props.drawable;
         }
     }
 
     componentWillUnmount() {
         document.removeEventListener('mousemove', this.onMouseMove, false);
+        document.removeEventListener('mousedown', this.onMouseDown, false);
+        document.removeEventListener('mouseup', this.onMouseUp, false);
     }
+
+    onMouseDown = () => {
+        this.setState({ canDraw: true });
+        const newSeries = {
+            type: 'line',
+            showInLegend: false,
+            markerType: 'none',
+            dataPoints: []
+        };
+        this.props.chart.options.data.push(newSeries);
+        this.props.chart.render();
+    };
+
+    onMouseUp = () => {
+        this.setState({ canDraw: false });
+    };
 
     onMouseMove = (evt) => {
         this.state.mouseEvt = evt;
+        if (this.props.drawable) {
+            this.drawMarker(evt);
+        }
     };
 
     onInitCanvas = (canvas) => {
         this.share = canvas;
-        if (this.props.capturedContext) {
-            this.captureCanvasInterval(this.props.capturedContext).then((interval) => {
+        if (this.props.chart.ctx) {
+            this.captureCanvasInterval(this.props.chart.ctx).then((interval) => {
                 this.interval = interval;
             });
         }
@@ -59,6 +89,50 @@ class CanvasStreamContainer extends Component {
 
     getStream = () => {
         return this.share.captureStream(25);
+    };
+
+    clearAll = () => {
+        const { chart } = this.props;
+
+        if (chart && chart.options.data.length > 1) {
+            chart.options.data = chart.options.data.slice(0, 1);
+            chart.render();
+        }
+    };
+
+    clearLast = () => {
+        const { chart } = this.props;
+
+        if (chart && chart.options.data.length > 1) {
+            chart.options.data = chart.options.data.slice(0, -2);
+            chart.render();
+        }
+    };
+
+    drawMarker = (mouseEvt) => {
+        const {
+            chart: {
+                axisX: [{ viewportMinimum: minX, range: rangeX }],
+                axisY: [{ viewportMinimum: minY, range: rangeY }],
+            }
+        } = this.props;
+        const { chart: { plotArea: { x1, x2, y1, y2, width, height } } } = this.props;
+
+        const { x, y } = getMousePos(this.props.chart.ctx.canvas, mouseEvt);
+
+        if (x1 <= x && x <= x2 && y1 <= y && y <= y2) {
+            const mouseX = x - x1;
+            const mouseY = height - (y - y1);
+            const koefX = (rangeX / width);
+            const koefY = (rangeY / height);
+            const dataX = (mouseX * koefX) + minX;
+            const dataY = (mouseY * koefY) + minY;
+
+            if (this.state.canDraw) {
+                this.props.chart.data.slice(-1)[0].dataPoints.push({ x: dataX, y: dataY, lineColor: 'red' });
+                this.props.chart.render();
+            }
+        }
     };
 
     captureCanvasInterval = (srcCtx) => {
@@ -101,7 +175,11 @@ class CanvasStreamContainer extends Component {
     };
 
     render() {
-        return <CanvasStream refCanvas={this.onInitCanvas} {...this.props} />;
+        return (
+            <div>
+                <CanvasStream refCanvas={this.onInitCanvas} {...this.props} />
+            </div>
+        );
     }
 }
 

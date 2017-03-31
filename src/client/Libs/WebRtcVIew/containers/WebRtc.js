@@ -209,7 +209,10 @@ class WebRtcContainer extends Component {
                 {
                     this.props.children && (
                         React.cloneElement(this.props.children, {
-                            ref: cStream => (this.cStream = cStream)
+                            ref: (cStream) => {
+                                this.cStream = cStream;
+                                this.props.children.ref && this.props.children.ref(cStream);
+                            }
                         })
                     )
                 }

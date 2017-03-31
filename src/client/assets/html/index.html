@@ -14,8 +14,49 @@
     <script src="/canvasjs.min.js" ></script >
     <script type="text/javascript" >
 
+        function makeDS(limit, nomarker) {
+            var y = 0;
+            var dataSeries = {
+                type: "line",
+                showInLegend: nomarker,
+                legendText: "no marker",
+                markerType: nomarker ? "none" : 'circle',
+            };
+            var dataPoints = [];
+            for (var i = 0; i < limit; i += 1) {
+                y += (Math.random() * 10 - 5);
+                dataPoints.push({
+                    x: i - limit / 2,
+                    y: y
+                });
+            }
+            dataSeries.dataPoints = dataPoints;
+            return dataSeries;
+        }
+
         window.onload = function () {
-            window.chart1 = new CanvasJS.Chart("chartContainer", {
+            //increase number of dataPoints by increasing this
+
+
+            var data = [];
+            data.push(makeDS(1000));
+            data.push(makeDS(0, true));
+
+            window.chart1 = new CanvasJS.Chart("chartContainer1", {
+                title: {
+                    text: "Try Zooming And Panning"
+                },
+                axisY: {
+                    includeZero: false
+                },
+                toolTip: {
+                    enabled: false,
+                },
+                data: data,  // random generator below
+            });
+            window.chart1.render();
+
+            window.chart2 = new CanvasJS.Chart("chartContainer", {
                 theme: "theme2",//theme1
                 title: {
                     text: "Basic Column Chart - CanvasJS"
@@ -35,33 +76,12 @@
                     }
                 ]
             });
-            window.chart1.render();
-
-            window.chart2 = new CanvasJS.Chart("chartContainer1", {
-                theme: "theme2",//theme1
-                title: {
-                    text: "Basic Column Chart - CanvasJS"
-                },
-                animationEnabled: false,   // change to true
-                data: [
-                    {
-                        // Change type to "bar", "area", "spline", "pie",etc.
-                        type: "column",
-                        dataPoints: [
-                            { label: "apple", y: 4 },
-                            { label: "orange", y: 5 },
-                            { label: "banana", y: 6 },
-                            { label: "mango", y: 30 },
-                            { label: "grape", y: 4 }
-                        ]
-                    }
-                ]
-            });
             window.chart2.render();
-
             const script = document.createElement('script');
             script.src = '/static/js/main.js';
             document.head.appendChild(script);
+
+
         }
     </script >
 </head >
