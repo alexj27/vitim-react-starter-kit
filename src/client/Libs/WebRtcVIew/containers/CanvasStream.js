@@ -104,7 +104,7 @@ class CanvasStreamContainer extends Component {
         const { chart } = this.props;
 
         if (chart && chart.options.data.length > 1) {
-            chart.options.data = chart.options.data.slice(0, -2);
+            chart.options.data.pop();
             chart.render();
         }
     };
