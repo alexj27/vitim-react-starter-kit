@@ -112,10 +112,10 @@ function initConnection(conn) {
         switch (request.type) {
             case SIG_REGISTRATION: {
                 userId = request.selfId;
-                if (connections[userId]) {
-                    conn.send(s({ type: failed(SIG_REGISTRATION), reason: 'Another user use this account' }));
-                    break;
-                }
+                // if (connections[userId]) {
+                //     conn.send(s({ type: failed(SIG_REGISTRATION), reason: 'Another user use this account' }));
+                //     break;
+                // }
 
                 conn.send(s({ type: succeeded(SIG_REGISTRATION) }));
                 conn.send(s({
@@ -131,7 +131,7 @@ function initConnection(conn) {
             case SIG_LOGOUT: {
                 userId = request.selfId;
                 if (!connections[userId]) {
-                    conn.send(s({ type: failed(SIG_REGISTRATION), reason: '' }));
+                    conn.send(s({ type: failed(SIG_REGISTRATION), reason: 'logaut' }));
                     break;
                 }
 
