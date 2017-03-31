@@ -58,6 +58,7 @@ function disconnectUser(userId) {
         return;
     }
     delete connections[userId];
+    delete activeCalls[userId];
 
     _.forEach(connections, function (connection) {
         connection.send(s({ type: SIG_USER_DISCONNECTED, userId: userId }));
