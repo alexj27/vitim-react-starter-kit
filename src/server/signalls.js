@@ -106,7 +106,7 @@ function initConnection(conn) {
     var userId;
 
     conn.on('message', function (json) {
-        //console.log('Received ', json);
+        console.log('Received ', json);
         const request = p(json);
 
         switch (request.type) {
