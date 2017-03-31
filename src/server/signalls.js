@@ -24,6 +24,7 @@ function failed(type) {
 }
 
 const SIG_REGISTRATION = 'SIG_REGISTRATION';
+const SIG_LOGOUT = 'SIG_LOGOUT';
 const SIG_CALL = 'SIG_CALL';
 const SIG_EXCHANGE = 'SIG_EXCHANGE';
 const SIG_CALL_OFFER = 'SIG_CALL_OFFER';
@@ -110,7 +111,12 @@ function initConnection(conn) {
 
         switch (request.type) {
             case SIG_REGISTRATION: {
-                userId = request.selfId.toString();
+                userId = request.selfId;
+                if (connections[userId]) {
+                    conn.send(s({ type: failed(SIG_REGISTRATION), reason: 'already registered' }));
+                    break;
+                }
+
                 conn.send(s({ type: succeeded(SIG_REGISTRATION) }));
                 conn.send(s({
                     type: SIG_SET_REGISTERED_USERS, users: Object.keys(connections).filter(function (id) {
@@ -120,6 +126,16 @@ function initConnection(conn) {
 
                 connections[request.selfId] = conn;
                 registrationsNotify(request.selfId);
+                break;
+            }
+            case SIG_LOGOUT: {
+                userId = request.selfId;
+                if (!connections[userId]) {
+                    conn.send(s({ type: failed(SIG_REGISTRATION), reason: '' }));
+                    break;
+                }
+
+                disconnectUser(userId);
                 break;
             }
             case SIG_CALL: {
