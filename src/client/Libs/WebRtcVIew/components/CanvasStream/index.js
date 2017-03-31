@@ -7,8 +7,7 @@ class CanvasStream extends Component {
     };
 
     render() {
-        // style={{ opacity: 0, position: 'absolute', top: '-100000px' }}
-        return <canvas ref={this.props.refCanvas} />;
+        return <canvas style={{ opacity: 0, position: 'absolute', top: '-100000px' }} ref={this.props.refCanvas} />;
     }
 }
 

@@ -48,8 +48,8 @@ function p(json) {
 
 const connections = {};
 const activeCalls = {};
-const patients = {};
-const doctors = {};
+// const patients = {};
+// const doctors = {};
 
 
 function disconnectUser(userId) {
@@ -107,8 +107,13 @@ function initConnection(conn) {
     var userId;
 
     conn.on('message', function (json) {
-        console.log('Received ', json);
+
         const request = p(json);
+
+        if (request.type !== SIG_EXCHANGE) {
+            console.log('Received ', json);
+            console.log('Before', activeCalls, Object.keys(connections));
+        }
 
         switch (request.type) {
             case SIG_REGISTRATION: {
@@ -204,6 +209,7 @@ function initConnection(conn) {
             }
             default:
         }
+        console.log('After', activeCalls, Object.keys(connections));
     });
 
     conn.on('error', function (errObj) {
