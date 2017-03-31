@@ -167,7 +167,7 @@ class CanvasStreamContainer extends Component {
                             dstCtx.drawImage(cursorImage, pos.x / scaleX - 5, pos.y / scaleY - 5, 20, 25);
                         }
                     }
-                }, 100);
+                }, 50);
                 resolve(timer);
             };
             cursorImage.src = cursorImg;
