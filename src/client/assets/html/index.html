@@ -57,32 +57,9 @@
             });
             window.chart1.render();
 
-            window.chart2 = new CanvasJS.Chart("chartContainer", {
-                theme: "theme2",//theme1
-                title: {
-                    text: "Basic Column Chart - CanvasJS"
-                },
-                animationEnabled: false,   // change to true
-                data: [
-                    {
-                        // Change type to "bar", "area", "spline", "pie",etc.
-                        type: "column",
-                        dataPoints: [
-                            { label: "apple", y: 10 },
-                            { label: "orange", y: 15 },
-                            { label: "banana", y: 25 },
-                            { label: "mango", y: 30 },
-                            { label: "grape", y: 28 }
-                        ]
-                    }
-                ]
-            });
-            window.chart2.render();
             const script = document.createElement('script');
             script.src = '/static/js/main.js';
             document.head.appendChild(script);
-
-
         }
     </script >
 </head >
@@ -90,8 +67,7 @@
 <div id="root" ></div >
 
 <div class="container" style="display: flex; flex-direction: row" >
-    <div id="chartContainer" style="height: 200px; width: 300px; margin: 10px;" ></div >
-    <div id="chartContainer1" style="height: 200px; width: 300px; margin: 10px;" ></div >
+    <div id="chartContainer1" style="height: 200px; width: 100%; margin: 10px;" ></div >
 </div >
 
 </body >

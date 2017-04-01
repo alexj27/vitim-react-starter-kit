@@ -35,8 +35,8 @@ export default class DemoWebRtc extends PureComponent {
                     <button onClick={() => this.setState({ drawable: !drawable })} >{drawable ? 'Can draw' : 'View'}</button>
                     <button onClick={this.clearChart}>Clear All</button>
                     <button onClick={this.clearLast}>Clear Last</button>
-                    <button onClick={() => this.setState({ chart: window.chart2 })} >Chart #1</button>
-                    <button onClick={() => this.setState({ chart: window.chart1 })} >Chart #2</button>
+                    {/*<button onClick={() => this.setState({ chart: window.chart1 })} >Chart #1</button>*/}
+                    {/*<button onClick={() => this.setState({ chart: window.chart2 })} >Chart #2</button>*/}
                 </div>
                 <div>
                     <h4>Users: </h4>
