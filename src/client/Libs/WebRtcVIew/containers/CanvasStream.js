@@ -12,6 +12,10 @@ function getMousePos(canvas, evt) {
 }
 
 
+const CANVAS_FPS = 25;
+const CANVAS_WIDTH = 400;
+const CANVAS_HEIGHT = 300;
+
 class CanvasStreamContainer extends Component {
 
     static propTypes = {
@@ -88,7 +92,7 @@ class CanvasStreamContainer extends Component {
     };
 
     getStream = () => {
-        return this.share.captureStream(25);
+        return this.share.captureStream(CANVAS_FPS);
     };
 
     clearAll = () => {
@@ -142,9 +146,21 @@ class CanvasStreamContainer extends Component {
         const dstCanvas = this.share;
         const dstCtx = dstCanvas.getContext('2d');
 
-        dstCtx.canvas.width = 500;
-        dstCtx.canvas.height = 250;
-        dstCtx.drawImage(srcCtx.canvas, 0, 0);
+        dstCtx.beginPath();
+        dstCtx.rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        dstCtx.fillStyle = 'red';
+        dstCtx.fill();
+
+        dstCtx.canvas.width = srcCtx.canvas.width;
+        dstCtx.canvas.height = srcCtx.canvas.height;
+
+        dstCtx.drawImage(
+            srcCtx.canvas,
+            0, 0,
+            srcCtx.canvas.width, srcCtx.canvas.height,
+            0, 0,
+            dstCtx.canvas.width, dstCtx.canvas.height,
+        );
 
         const cursorImage = new Image();
 
@@ -162,12 +178,12 @@ class CanvasStreamContainer extends Component {
                                 0, 0,
                                 srcCtx.canvas.width, srcCtx.canvas.height,
                                 0, 0,
-                                dstCtx.canvas.width, dstCtx.canvas.height
+                                dstCtx.canvas.width, dstCtx.canvas.height,
                             );
                             dstCtx.drawImage(cursorImage, pos.x / scaleX - 5, pos.y / scaleY - 5, 20, 25);
                         }
                     }
-                }, 50);
+                }, Math.round(1000 / CANVAS_FPS));
                 resolve(timer);
             };
             cursorImage.src = cursorImg;
