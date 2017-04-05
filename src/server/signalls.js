@@ -36,6 +36,7 @@ const SIG_CALL_REJECTED = 'SIG_CALL_REJECTED';
 const SIG_HUNG_UP = 'SIG_HUNG_UP';
 const SIG_USERS_BUSY = 'SIG_USERS_BUSY';
 const SIG_USERS_FREE = 'SIG_USERS_FREE';
+const SIG_NOTIFICATION = 'SIG_NOTIFICATION';
 
 
 function s(obj) {
@@ -161,6 +162,26 @@ function initConnection(conn) {
                     to: request.userId,
                     from: userId
                 }));
+                break;
+            }
+            case SIG_NOTIFICATION: {
+                if (connections[request.userId]) {
+                    connections[request.userId].send(s({
+                        type: SIG_NOTIFICATION,
+                        message: request.message,
+                        from: userId
+                    }));
+                    conn.send(s({
+                        type: succeeded(SIG_CALL),
+                        to: request.userId
+                    }));
+                } else {
+                    conn.send(s({
+                        type: failed(SIG_CALL),
+                        to: request.userId,
+                        reason: 'not_available'
+                    }));
+                }
                 break;
             }
             case SIG_CALL_REJECTED: {
