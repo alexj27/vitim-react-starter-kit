@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { WebRtc, CanvasStream, call, callAccept, callReject } from '../../../../Libs/WebRtcVIew';
+import CanvasJsAnnotation from '../../../../Libs/CanvasJsAnnotation';
 import './DemoWebRtc.less';
 
 
@@ -26,6 +27,7 @@ export default class DemoWebRtc extends PureComponent {
 
         return (
             <div className="DemoWebRtc container" >
+                <CanvasJsAnnotation chart={window.chart2} onAnnotationAdded={(data) => alert(JSON.stringify(data))} drawable />
                 <WebRtc>
                     <CanvasStream ref={com => (this.state.canvasStream = com)} drawable={drawable} chart={this.state.chart} />
                 </WebRtc>
@@ -51,6 +53,9 @@ export default class DemoWebRtc extends PureComponent {
                     <button onClick={() => dispatch(callAccept(inCallFrom))} >Accept</button> : null}
                 {ring === 'incoming' && inCallFrom ?
                     <button onClick={() => dispatch(callReject(inCallFrom))} >Rejected</button> : null}
+
+
+
             </div>
         );
     }

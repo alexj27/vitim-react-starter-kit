@@ -40,7 +40,9 @@
 
             var data = [];
             data.push(makeDS(1000));
-            data.push(makeDS(0, true));
+
+            var data1 = [];
+            data1.push(makeDS(1000));
 
             window.chart1 = new CanvasJS.Chart("chartContainer1", {
                 title: {
@@ -57,9 +59,21 @@
             });
             window.chart1.render();
 
+            window.chart2 = new CanvasJS.Chart("chartContainer", {
+                theme: "theme2",//theme1
+                title: {
+                    text: "Basic Column Chart - CanvasJS"
+                },
+                zoomEnabled: false,
+                animationEnabled: false,   // change to true
+                data: data1
+            });
+            window.chart2.render();
             const script = document.createElement('script');
             script.src = '/static/js/main.js';
             document.head.appendChild(script);
+
+
         }
     </script >
 </head >
@@ -67,7 +81,8 @@
 <div id="root" ></div >
 
 <div class="container" style="display: flex; flex-direction: row" >
-    <div id="chartContainer1" style="height: 200px; width: 100%; margin: 10px;" ></div >
+    <div id="chartContainer" style="height: 200px; width: 300px; margin: 10px;" ></div >
+    <div id="chartContainer1" style="height: 200px; width: 300px; margin: 10px;" ></div >
 </div >
 
 </body >
