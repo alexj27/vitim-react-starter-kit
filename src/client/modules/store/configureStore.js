@@ -2,7 +2,6 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import asyncMiddleware from 'redux-thunk';
 import promiseMiddleware from '../middleware/promise';
 import rootReducer from '../reducers';
-import { signalsMiddleware } from '../../Libs/WebRtcVIew';
 
 
 export default function configureStore(initialState) {
@@ -19,7 +18,6 @@ export default function configureStore(initialState) {
             applyMiddleware(
                 asyncMiddleware,
                 promiseMiddleware,
-                signalsMiddleware,
             )
         ));
 
